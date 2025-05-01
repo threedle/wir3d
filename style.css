@@ -188,7 +188,7 @@ video {
 .qtrwidthflex {
   display: block;
   width: calc(0.5 * var(--halfwidthflex-w));
-  margin: 0px auto;
+  margin: 10px auto;
 }
 
 .teaser {
@@ -218,12 +218,12 @@ video {
     text-align: center;
 
     >video.srcshape {
-      width: 42%;
+      width: 50%;
       z-index: 3;
     }
 
     >video.rsltshape {
-      width: 84%;
+      width: 100%;
       z-index: 2;
     }
 
@@ -234,6 +234,104 @@ video {
       text-align: center;
     }
   }
+}
+
+.gallery {
+  --promptfontsz: 1.1rem;
+
+  .promptprefix {
+    font-size: var(--promptfontsz);
+    color: #717171;
+    font-style: italic;
+  }
+
+  .promptprefix::before {
+    content: '';
+    background-image: url("https://cdn0.iconfinder.com/data/icons/phosphor-bold-vol-3-1/256/pencil-line-duotone-128.png");
+    opacity: 0.5;
+    display: inline-block;
+    background-size: var(--promptfontsz) var(--promptfontsz);
+    width: var(--promptfontsz);
+    height: var(--promptfontsz);
+    transform: translateY(3px);
+    margin-right: 5px;
+    background-repeat: no-repeat;
+
+  }
+
+  .qtrwidthflex {
+    text-align: center;
+
+    >video.srcshape {
+      width: 32%;
+      z-index: 3;
+    }
+
+    >video.rsltshape {
+      width: 66%;
+      z-index: 2;
+    }
+
+    >.promptcaption {
+      font-size: var(--promptfontsz);
+      font-style: italic;
+      color: var(--accent);
+      text-align: center;
+    }
+  }
+}
+
+.nosrcgallery {
+  --promptfontsz: 1.1rem;
+
+  .promptprefix {
+    font-size: var(--promptfontsz);
+    color: #717171;
+    font-style: italic;
+  }
+
+  .promptprefix::before {
+    content: '';
+    background-image: url("https://cdn0.iconfinder.com/data/icons/phosphor-bold-vol-3-1/256/pencil-line-duotone-128.png");
+    opacity: 0.5;
+    display: inline-block;
+    background-size: var(--promptfontsz) var(--promptfontsz);
+    width: var(--promptfontsz);
+    height: var(--promptfontsz);
+    transform: translateY(3px);
+    margin-right: 5px;
+    background-repeat: no-repeat;
+
+  }
+
+  .qtrwidthflex {
+    text-align: center;
+
+    >video.rsltshape {
+      width: 100%;
+      z-index: 2;
+    }
+
+    >.promptcaption {
+      font-size: var(--promptfontsz);
+      font-style: italic;
+      color: var(--accent);
+      text-align: center;
+    }
+  }
+}
+
+.videoflex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.videoflex video {
+  flex: 0 0 auto;    /* Prevent videos from shrinking or growing */
+  width: 300px;      /* Set a fixed width */
+  height: auto;
 }
 
 .imgsflex {
@@ -299,13 +397,37 @@ p {
   font-size: 1.2rem;
 }
 
-.graybox {
+/* .graybox {
   border-radius: var(--bordrad);
   box-shadow: var(--buttonshadowsz) var(--notwhite-shaded), var(--dropshadow);
   background-color: var(--notwhite);
   padding: 1.2rem 1.6rem;
+} */
+
+.widgetbox {
+  display: flex;
+  align-items: center;
+  color: rgb(242, 247, 252);
+  border-radius: var(--bordrad);
+  padding: 0.5rem;
+  width: fit-content;
+  margin: 0.5rem;
+  border-radius: var(--bordrad);
+  background-color: var(--accent);
+  box-shadow: var(--buttonshadowsz) var(--accent-shaded), var(--dropshadow);
+
+  .label {
+    font-size: var(--venuesz);
+    /* font-weight: bold; */
+  }
 }
 
+.graybox {
+  border-radius: var(--bordrad);
+  box-shadow: var(--buttonshadowsz) var(--notwhite-shaded), var(--dropshadow), 0px 0px 10px rgba(0, 0, 0, 0.2);
+  background-color: var(--notwhite);
+  padding: 1.2rem 1.6rem;
+}
 
 .toppadextra {
   padding-top: 1.6rem;

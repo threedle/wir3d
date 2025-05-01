@@ -2,13 +2,15 @@
 <html>
 
 <head>
-  <title>Geometry in Style</title>
+  <title>WIR3D: Visually-Informed and Geometry-Aware 3D Shape Abstraction</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="assets/pineapple-icon-144.png">
-  <title>Geometry in Style</title>
   <link href="style.css" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/Highlight-Clean.css">
+  <link rel="stylesheet" href="./assets/css/styles.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js"></script>
   <style>
     /* from https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css */
     @font-face {
@@ -39,13 +41,13 @@
     }
   </style>
 
-  <meta name="description" content="Geometry in Style: 3D Stylization via Surface Normal Deformation">
-  <meta name="keywords" content="geometry, graphics, processing, stylization, 3d, shape, generative">
+  <meta name="description" content="WIR3D: Visually-Informed and Geometry-Aware 3D Shape Abstraction">
+  <meta name="keywords" content="geometry, graphics, abstraction, 3d, shape, generative">
 
-  <meta property='og:title' content='Geometry in Style' />
-  <meta property='og:url' content='https://threedle.github.io/geometry-in-style/' />
+  <meta property='og:title' content='WIR3D' />
+  <meta property='og:url' content='https://threedle.github.io/wir3d/' />
   <meta property='og:image'
-    content='https://raw.githubusercontent.com/threedle/geometry-in-style/refs/heads/main/assets/teaser.png' />
+    content='https://raw.githubusercontent.com/threedle/wir3d/refs/heads/main/assets/teaser.png' />
   <meta property="og:type" content="website" />
 </head>
 
@@ -57,186 +59,477 @@
       </div>
     </a>
     <div class="titlebox">
-      <h1>Geometry in<i class="med-nbsp" aria-hidden="true"></i>Style:<wbr> 3D<i class="med-nbsp"
-          aria-hidden="true"></i>Stylization via Surface<i class="wide-nbsp" aria-hidden="true"></i>Normal<i
-          class="wide-nbsp" aria-hidden="true"></i>Deformation</h1>
+      <h1>WIR3D: Visually-Informed and Geometry-Aware 3D Shape Abstraction</h1>
     </div>
     <nav>
-      <span class="venue" aria-label="venue"><i class="icon fas fa-map-marker-alt" aria-hidden="true"></i>CVPR
-        2025</span>
-      <a href="https://people.cs.uchicago.edu/~namanh/papers/geometry-in-style.pdf" aria-label="paper pdf">
+      <!-- <span class="venue" aria-label="venue"><i class="icon fas fa-map-marker-alt" aria-hidden="true"></i>CVPR
+        2025</span> -->
+      <a href="" aria-label="paper pdf">
         <i class="icon fas fa-file-pdf"></i>Paper
       </a>
-      <a href="http://arxiv.org/abs/2503.23241"><i class="icon ai ai-arxiv"></i>arXiv</a>
-      <a href="https://github.com/threedle/geometry-in-style/" aria-label="code github"><i
+      <a href=""><i class="icon ai ai-arxiv"></i>arXiv</a>
+      <a href="https://github.com/threedle/wir3d" aria-label="code github"><i
           class="icon fab fa-github"></i>Code</a>
     </nav>
     <div class="authors" aria-label="authors">
-      <span><a href="https://people.cs.uchicago.edu/~namanh/">Nam Anh Dinh</a><sup>1</sup></span>
+      <span><a href="https://rgliu.com/">Richard Liu</a><sup>1</sup></span>
+      <span><a href="">Daniel Fu</a><sup>1</sup></span>
+      <span><a href="">Noah Tan</a><sup>1</sup></span>
       <span><a href="https://itailang.github.io/">Itai Lang</a><sup>1</sup></span>
-      <span><a href="https://hywkim-brian.github.io/site">Hyunwoo Kim</a><sup>1</sup></span>
-      <span><a href="https://odedstein.com/">Oded Stein</a><sup>2</sup></span>
       <span><a href="https://people.cs.uchicago.edu/~ranahanocka/">Rana Hanocka</a><sup>1</sup></span>
     </div>
-    <div class="affiliations" aria-label="affiliations"><sup>1</sup>University of Chicago, <sup>2</sup>University of
-      Southern California</div>
+    <div class="affiliations" aria-label="affiliations"><sup>1</sup>University of Chicago</div>
   </section>
-  <section class="teaser" aria-label="teaser">
-    <figcaption class="promptprefix" aria-label="prompt prefix">a 3d render of&hellip;</figcaption>
-    <div class="imgsflex">
-      <figure class="qtrwidthflex vidloadsync">
-        <video class="srcshape" style="margin: 0 -11%" autoplay
-          poster="assets/animrenders-compress/poster-animrender-0314-106clean-remesh.mp4.jpg" preload muted loop
-          playsinline aria-label="video of rotating gray angular vase shape">
-          <source src="assets/animrenders-compress/animrender-0314-106clean-remesh.mp4" type="video/mp4">
-        </video>
-        <video class="rsltshape" style="margin: 0 -9.5%" autoplay
-          poster="assets/animrenders-compress/poster-animrender-reslt-11-04.314-pineapplethemedvase.mp4.jpg" preload
-          muted loop playsinline
-          aria-label="video of rotating blue vase, the above vase but stylized to have pineapple geometric texture in body and top opening">
-          <source src="assets/animrenders-compress/animrender-reslt-11-04.314-pineapplethemedvase.mp4" type="video/mp4">
-        </video>
-        <figcaption class="promptcaption">a pineapple-themed vase</figcaption>
-      </figure>
-      <figure class="qtrwidthflex vidloadsync">
-        <video class="srcshape" style="margin: 0 -12%" autoplay
-          poster="assets/animrenders-compress/poster-animrender-person-remesh.mp4.jpg" preload muted loop playsinline
-          aria-label="video of rotating gray person shape">
-          <source src="assets/animrenders-compress/animrender-person-remesh.mp4" type="video/mp4">
-        </video>
-        <video class="rsltshape" style="margin: 0 -8%" autoplay
-          poster="assets/animrenders-compress/poster-animrender-reslt-11-06.204-knightinarmor.mp4.jpg" preload muted
-          loop playsinline
-          aria-label="video of rotating blue person shape, the above person but stylized to look like a knight">
-          <source src="assets/animrenders-compress/animrender-reslt-11-06.204-knightinarmor.mp4" type="video/mp4">
-        </video>
-        <figcaption class="promptcaption">an A-pose knight in armor</figcaption>
-      </figure>
-      <figure class="qtrwidthflex vidloadsync">
-        <video class="srcshape" style="margin: 0 -11%" autoplay
-          poster="assets/animrenders-compress/poster-animrender-0305-rocking-chair.mp4.jpg" preload muted loop
-          playsinline aria-label="video of rotating gray rocking chair shape">
-          <source src="assets/animrenders-compress/animrender-0305-rocking-chair.mp4" type="video/mp4">
-        </video>
-        <video class="rsltshape" style="margin: 0 -7%" autoplay
-          poster="assets/animrenders-compress/poster-animrender-reslt-11-04.305-cuteanimalthemedchair.mp4.jpg" preload
-          muted loop playsinline
-          aria-label="video of rotating blue rocking chair, the same rocking chair but rounded with cute ears on the seat back">
-          <source src="assets/animrenders-compress/animrender-reslt-11-04.305-cuteanimalthemedchair.mp4"
-            type="video/mp4">
-        </video>
-        <figcaption class="promptcaption">a cute animal-themed chair</figcaption>
-      </figure>
-      <figure class="qtrwidthflex vidloadsync">
-        <video class="srcshape" style="margin: 0 -9%; width: 39%" autoplay
-          poster="assets/animrenders-compress/poster-animrender-0313-coseg-goat-remesh.mp4.jpg" preload muted loop
-          playsinline aria-label="video of rotating gray goat shape">
-          <source src="assets/animrenders-compress/animrender-0313-coseg-goat-remesh.mp4" type="video/mp4">
-        </video>
-        <video class="rsltshape" style="margin: 0 -5%" autoplay
-          poster="assets/animrenders-compress/poster-animrender-reslt-11-04.313-legogoat.mp4.jpg" preload muted loop
-          playsinline
-          aria-label="video of rotating blue goat, the above goat but stylized with a blocky lego-like body and neck and head">
-          <source src="assets/animrenders-compress/animrender-reslt-11-04.313-legogoat.mp4" type="video/mp4">
-        </video>
-        <figcaption class="promptcaption">a lego goat</figcaption>
-      </figure>
+  <section aria-label="teaser">
+      <video class="srcshape" style="width:10%;margin-right:-50px;z-index:3" autoplay
+        preload muted loop
+        playsinline aria-label="nefertiti">
+        <source src="assets/all_results/nefertiti/gt.mp4" type="video/mp4">
+      </video>
+      <video class="rsltshape" style="width:19%;margin-right:-40px" autoplay
+        preload
+        muted loop playsinline
+        aria-label="nefertiti curves">
+        <source src="assets/all_results/nefertiti/curves.mp4" type="video/mp4">
+      </video>
+      <video class="srcshape" style="width:10%;margin-right:-17px;z-index:3" autoplay
+        preload muted
+        loop playsinline
+        aria-label="dragon">
+        <source src="assets/all_results/dragon/gt.mp4" type="video/mp4">
+      </video>
+      <video class="rsltshape" style="width:19%;margin-right:-20px" autoplay
+        preload muted loop playsinline
+        aria-label="dragon curves">
+        <source src="assets/all_results/dragon/curves.mp4" type="video/mp4">
+      </video>
+      <video class="srcshape" style="width:10%;margin-right:-23px;z-index:3" autoplay
+        preload
+        muted loop playsinline
+        aria-label="watermelon slice">
+        <source src="assets/all_results/FakeFruit_B09992T572_WatermelonSlice/gt.mp4"
+          type="video/mp4">
+      </video>
+      <video class="rsltshape" style="width:19%;margin-right:-19px" autoplay
+        preload muted loop
+        playsinline aria-label="watermelon slice curves">
+        <source src="assets/all_results/FakeFruit_B09992T572_WatermelonSlice/curves.mp4" type="video/mp4">
+      </video>
+      <video class="srcshape" style="width:10%;margin-right:-15px;z-index:3" autoplay
+        preload muted loop
+        playsinline
+        aria-label="green robot t-rex">
+        <source src="assets/all_results/Dino_B0B85R8LC9_GreenRobotTRex/gt.mp4" type="video/mp4">
+      </video>
+      <video class="rsltshape" style="width:19%" autoplay
+        preload muted loop
+        playsinline aria-label="green robot t-rex curves">
+        <source src="assets/all_results/Dino_B0B85R8LC9_GreenRobotTRex/curves.mp4" type="video/mp4">
+      </video>
+    </div>
+  </section>
+  <section>
     </div>
     <p class="graybox">
-      Guided by a text prompt, Geometry in Style produces an identity-preserving stylization
-      of mesh geometry. The deformation is represented and optimized via per-vertex normals,
-      solved into vertex displacements in an inherently regularizing manner using dARAP,
-      a differentiable one-step adaptation of classical As-Rigid-As-Possible deformation.
+      <b>Abstract.</b> <i>We present WIR3D, a technique for abstracting 3D shapes through a sparse set of visually meaningful curves in 3D. We optimize the parameters of Bezier curves such that they faithfully represent both the geometry and salient visual features (e.g. texture) of the shape from arbitrary viewpoints. We leverage the intermediate activations of a pre-trained foundation model (CLIP) to guide our optimization process. We divide our optimization into two phases: one for capturing the coarse geometry of the shape, and the other for representing fine-grained features. Our second phase supervision is spatially guided by a novel localized keypoint loss. This spatial guidance enables user
+        control over abstracted features. We ensure fidelity to the
+        original surface through a neural SDF loss, which allows
+        the curves to be used as intuitive deformation handles. We
+        successfully apply our method for shape abstraction over a
+        broad dataset of shapes with varying complexity, geometric
+        structure, and texture, and demonstrate downstream applications for feature control and shape deformation.</i>
     </p>
+
   </section>
-  <section>
-    <h2>Optimization overview</h2>
-    <img class="mediumwidth blcent" src="assets/overview.png"
-      alt="process diagram. gray vase shape (labeled 'input mesh'), with zoomed in inset showing local vertex neighborhood at vertex k, having a current normal u_k and target normal u_k hat with a depiction of rotation R_k hat from current to target. inset zooms back out to show R_k hat as part of a vector of R from all vertices stacked (labeled 'local rotations'). this stack goes to a 'global solve' step illustrated as the blue pineapple styled vase. depictions of cameras surround the right side, next to a column of images labeled 'differentiable rendering'; this result goes to a 'semantic loss' block with the prompt going into it; the loss is backpropagated to target normals from the vertex neighborhood">
-    <p class="graybox">
-      <b>Overview of an optimization iteration.</b> Using the normals undergoing optimization as a target for our
-      differentiable As-Rigid-As-Possible method (dARAP), the
-      dARAP local step computes a rotation matrix per vertex; the dARAP global solve then finds the deformed surface
-      from these local rotations. We use a differentiable renderer and a diffusion model-based semantic loss to
-      guide the normals being optimized towards a deformation matching the desired style prompt.
-    </p>
-  </section>
-  <section>
+  <section class="gallery" aria-label="gallery">
     <h2>Gallery</h2>
-    <img class="fullwidth blcent" src="assets/gallery-downsz.png"
-      alt="gallery of results, source shapes in gray and deformed in blue. a 3d render of... antique sofa, tropical chair, racing chair, greek statue chair, gothic chair, cardboard chair, cybernetic glove, skull, dinosaur statue, ornate art deco column (from a candle as source shape), penguin themed fire hydrant, racer bunny (with wheels for thighs)">
+    <div class="imgsflex">
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Airplane_B0B2CNHW9M_Blue/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Airplane_B0B2CNHW9M_Blue/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Airplane_B0B2CNHW9M_White/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Airplane_B0B2CNHW9M_White/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Airplane_B0B2DC5QBP_BlueGray/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Airplane_B0B2DC5QBP_BlueGray/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Airplane_B0C6Q4F88L_Gray/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Airplane_B0C6Q4F88L_Gray/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Airplane_B09WN2RN15_Black_1/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Airplane_B09WN2RN15_Black_1/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Airplane_B01178HTKM_Yellow/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Airplane_B01178HTKM_Yellow/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Axe_B0BSCG4XZ5_BrownWoodHandle/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Axe_B0BSCG4XZ5_BrownWoodHandle/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Axe_B09W4VBBQZ_Orange/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Axe_B09W4VBBQZ_Orange/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Bathroom_I1_50281856_BambooBox/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Bathroom_I1_50281856_BambooBox/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/bird/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/bird/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/BirdHouse_A79823645_BearWithLogStump/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/BirdHouse_A79823645_BearWithLogStump/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/BirdHouse_A81769558_GreenRoofPurpleButterflies/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/BirdHouse_A81769558_GreenRoofPurpleButterflies/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/BirdHouse_A81769745_RedRoofSnowCardinals/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/BirdHouse_A81769745_RedRoofSnowCardinals/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/BirdHouseWoodenRoofRedWall/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/BirdHouseWoodenRoofRedWall/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/bob/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/bob/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Candle_B0D17XW9NR_DarkBlueMedium/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Candle_B0D17XW9NR_DarkBlueMedium/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Dino_B08FMB1TGS_OrangeRedPterodactyl_1/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Dino_B08FMB1TGS_OrangeRedPterodactyl_1/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Dino_B08N9F269Z_BlueStegosaurus/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Dino_B08N9F269Z_BlueStegosaurus/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Dino3BeesMeRedTRex/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Dino3BeesMeRedTRex/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Dumbbell_B08JPJ7JVF_GreenPinkBlue/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Dumbbell_B08JPJ7JVF_GreenPinkBlue/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/FakeFruit_4507_HoneyDewMelon/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/FakeFruit_4507_HoneyDewMelon/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/Gargoyle_B0BYTQT173_Dragon/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/Gargoyle_B0BYTQT173_Dragon/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/GokuToy/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/GokuToy/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync" style="margin-top:-3%">
+        <video class="srcshape" autoplay
+          preload muted loop>
+          <source src="assets/all_results/spot/gt.mp4" type="video/mp4">
+        </video>
+        <video class="rsltshape" autoplay
+          preload
+          muted loop playsinline>
+          <source src="assets/all_results/spot/curves.mp4" type="video/mp4">
+        </video>
+      </figure>
+    </div>
     <p class="graybox">
-      <b>Various input meshes towards a variety of text-specified styles.</b>
-      The style can manifest as fine geometric details, like in the <em>ornate art deco
-        column</em>, or as low-frequency deformations, such as the joints of the <em>cybernetic
-        glove</em>. Our method retains the structural features of the input shape, such as a flat
-      arm on the <em>antique sofa</em>. Moreover, the resultant stylizations are in accordance
-      with prompt semantics and part-aware semantics: the folds in the tropical chair are on
-      the seat and backrest as opposed to the legs, the head of the penguin becomes like the
-      top of a fire hydrant, and the racer bunny's thigh turns into the shape of a wheel.
+      <b>Gallery of results.</b>
+      WIR3D is capable of abstracting a wide range of geometries and textures. 3D cubic Bezier curves are optimized to
+      plausibly represent the textured shape from arbitrary viewpoints, and the results demonstrate that our method
+      is capable of producing sparse strokes which abstract visual features from various perspectives without
+      issue despite the lack of occlusion relationships.
     </p>
   </section>
   <section>
-    <h2>Normals and differentiable&nbsp;ARAP</h2>
-    <div class="imgsflex flexgap">
-      <img class="halfwidthflex" src="assets/prerenderedfig-procrustes-oneline.svg"
-        alt="diagram showing procrustes local step; local neighborhood with vertex and neighboring edges and one-ring; vertex has current normal and target normal pointing out of it; panel showing the neighborhood of spokes-and-rims edges and the current normal, right arrow, question mark R in SO(3) (illustrating solving the procrustes problem), towards a panel showing the same neighborhood but with target normal. captioned 'local orthogonal procrustes problem'">
-    </div>
-    <p class="graybox toppadextra">
-      <img class="equationwidth blcent" style="--per-eqn-mult: 0.78" src="assets/localstep-argmin.svg">
-      <br>
-      <b>The local step. </b> Inspired by <a href="https://arxiv.org/abs/2104.11993">Normal-Driven
-        Spherical Shape Analogies</a>, we represent a deformation by a <em>target normal per vertex</em>. These
-      normals are first used as the target for a local Procrustes solve, which finds the best rotation matrix
-      taking a bundle of edge vectors (a spokes-and-rims neighborhood of halfedges, plus the original normal) to the
-      same neighborhood but with the target normal. A <em>λ</em> hyperparameter controls the strength of the rotation
-      solution towards the target normal. This solve is made batched and differentiable.
-    </p>
-    <p class="graybox toppadextra">
-      <img class="equationwidth blcent" src="assets/globalstep-argmin.svg">
-      <br>
-      <b>The global step.</b> Fixing the per-vertex rotations, we then find the best fit deformed
-      vertex positions. This least-squares optimization turns into a Poisson equation with the cotangent laplacian as
-      the system matrix, so we can use the differentiable solving technique from <a
-        href="https://arxiv.org/abs/2205.02904">Neural Jacobian Fields</a>.
-      <br><br>
-      <b>One local step-global step pair.</b> Our dARAP method is meant to be part of the "forward
-      pass" in a larger optimization pipeline. As such, we do not iterate the local and global steps as in classical
-      ARAP optimizations, instead relying on
-      gradient descent to optimize the deformation quantity (per-vertex normals) to attain the desired deformation in
-      one pass. We adjust the <em>λ</em> hyperparameter to allow the required strength in this one iteration.
+    <h2>Method overview</h2>
+    <img class="mediumwidth blcent" src="assets/wir3d_network_diagram.png"
+      alt="network diagram">
+    <p class="graybox">
+      <b>Method overview.</b> Our strokes are represented by 3D cubic Bezier curves. In the first stage,
+      we initialize curves to the shape using furthest distance sampling, and the curves are optimized
+      against Blender Freestyle renders to abstract the coarse geometry of the shape. The 3D regularization loss
+      ensures the curves stay close to the shaep surface and are visible from all viewpoints. The semantic loss
+      computes the L2 distance between the CLIP embeddings of the Freestyle renders and the curve renders.
+      In the second stage, we freeze the curves from the first stage and add new curves that are optimized to represent the shape's texture.
+      The new curves are initialized based on semantic keypoints on the surface which can be user specified or automatically detected.
+      The keypoints also enable spatial localization of the semantic loss, which ensures the optimization is guided by the
+      semantic features identified by the keypoints. Importantly, the second stage of training ensures that visually salient
+      texture and geometry features are abstracted.
     </p>
   </section>
   <section>
-    <h2>Expressiveness and specificity</h2>
+    <h2>Localized Keypoint Loss</h2>
+    <img class="mediumwidth blcent" src="assets/spatialdiagram.png"
+      alt="network diagram">
+    <p class="graybox">
+      <b>Localized keypoint loss.</b> Our localized keypoints weight the loss between the intermediate feature maps of the encoded
+      curve render \(I_{\text{curve}}\) and the target shape render \(I_{\text{target}}\). This weight is obtained through
+      projecting 3D keypoints (red), followed by a Gaussian filter to obtain the weight map \(I_{\text{weight}}\).
+      This loss focuses the optimization on visual features local to the keypoint.
+    </p>
+  </section>
+  <section class="nosrcgallery">
+    <h2>Level of Abstraction Control</h2>
     <div class="imgsflex">
-      <img class="halfwidthflex" style="width: calc(0.74 * var(--halfwidthflex-w))" src="assets/sameshape3row.png"
-        alt="same-shapes deformed towards different prompts. first row: person shape, prompts 'Chinese terracotta warrior', 'balloon person',  'samurai warrior in traditional armor'; second row basic chair shape, prompts are 'origami chair', 'butterfly-themed chair', 'church pulpit'; third row candle shape, prompts are 'retro game joystick', 'braided pillar candle', 'upright fountain pen'">
-      <img class="halfwidthflex" src="assets/samestyle-lego.png"
-        alt="shapes deformed towards the same lego prompt, three rows. first row: three chairs deformed with 'lego chair' prompt, variety of geometries made into blocky lego style. second row: animals, camel dog pig, deformed towards lego corresponding animal name. third row: three vases deformed towards 'vase made of lego bricks'">
+      <figure class="qtrwidthflex vidloadsync">
+        <video class="rsltshape" style="margin: 0 -9.5%" autoplay
+          preload
+          muted loop playsinline
+          aria-label="airplane gt">
+          <source src="assets/ncurves/gt.mp4" type="video/mp4">
+        </video>
+        <figcaption class="promptcaption">Target Shape</figcaption>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync">
+        <video class="rsltshape" autoplay
+          preload muted
+          loop playsinline
+          aria-label="airplane 10 curves">
+          <source src="assets/ncurves/grayplane_n10.mp4" type="video/mp4">
+        </video>
+        <figcaption class="promptcaption">10 Curves</figcaption>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync">
+        <video class="rsltshape" autoplay
+          preload muted
+          loop playsinline
+          aria-label="airplane 20 curves">
+          <source src="assets/ncurves/grayplane_n20.mp4" type="video/mp4">
+        </video>
+        <figcaption class="promptcaption">20 Curves</figcaption>
+      </figure>
+      <figure class="qtrwidthflex vidloadsync">
+        <video class="rsltshape" autoplay
+          preload muted
+          loop playsinline
+          aria-label="airplane 40 curves">
+          <source src="assets/ncurves/grayplane_n40.mp4" type="video/mp4">
+        </video>
+        <figcaption class="promptcaption">40 Curves</figcaption>
+      </figure>
     </div>
-    <p class="graybox">Our method performs diverse shape stylizations that adhere to the target style prompt with high
-      detail. We can deform the same source shape with different prompts; the different styles conform and adapt
-      to the source geometry while adding salient geometric texture and detail to semantically appropriate parts.
-      Target styles are also robust to different source shapes; even for shapes with very different geometry, the
-      <em>lego</em> style is consistently conveyed with a lego brick-like surface pattern and cubified geometry.
+    <p class="graybox"> <b>Level of Abstraction Control.</b> The level of abstraction is implicitly controlled by the number of
+      curves. As the curve count grows, the abstraction captures more fine details.
+    </p>
+  </section>
+  <section class="gallery">
+    <h2>Deformation Application</h2>
+    <video controls style="display:inline-block;width:49%;margin:auto;" autoplay
+      poster="assets/deformation_application/chair.png" preload muted loop
+      playsinline aria-label="chair deformation application">
+      <source src="assets/deformation_application/chair.mp4" type="video/mp4">
+    </video>
+    <video controls style="display:inline-block;width:49%;margin:auto;" autoplay
+      poster="assets/deformation_application/nefertiti.png" preload muted loop
+      playsinline aria-label="chair deformation application">
+      <source src="assets/deformation_application/nefertiti.mp4" type="video/mp4">
+    </video>
+    <center>
+      <video controls style="display:inline-block;width:49%;margin:auto;" autoplay
+      poster="assets/deformation_application/spot.png" preload muted loop
+      playsinline aria-label="chair deformation application">
+      <source src="assets/deformation_application/spot.mp4" type="video/mp4">
+    </video>
+    </center>
+    <p class="graybox"> <b>Deformation Application.</b> Our deformation application exploits the close correspondence between the optimized curves and
+      key visual features on the input surface, thanks to the SDF and keypoint localization losses. We develop a
+      simple skinning system for the surface where each vertex is assigned a set of skinning weights to points sampled
+      on all the curves in the scene. These skinning weights are based on the L2 distance between each vertex and sampled point,
+      and a softmax is applied to ensure they sum to 1. Transformations to each curve can then be automatically mapped to
+      the surface through these skinning weights, and the procedure can be performed at
+      interactive speeds. Note that <em>no smoothing postprocess</em> is applied to the mapped transformations, and the
+      smoothness of the deformations are a result of the effectiveness of the curves in interpolating the quantities along the
+      surface.
     </p>
   </section>
   <section>
-    <h2>Controllable strength and region</h2>
+    <h2>Keypoint Control</h2>
     <div class="imgsflex">
-      <img class="halfwidthflex" src="assets/lambdatweak-robotlion.png"
-        alt="source gray lion shape deformed towards 'a 3d render of a robot lion' prompt; three deformed results, first one at lambda=5 is a subtle robot style with sharp edges on body but smooth; second one at lambda=8 (lambda used at optimization) is a nice salient robot style with mechanical legs and joints and waist; lambda=11 very prominent robot style with exaggerated sharp features from the previous ones, with sharp mechanical looking parts and joints">
-      <img class="halfwidthflex" style="width: calc(0.5 * var(--halfwidthflex-w))"
-        src="assets/localdeform-spotbulldog.png"
-        alt="source cartoon cow shape with the head region highlighted in yellow; prompt 'a 3d render of a bulldog', deform result shows the head region turned into a bulldog head, rest of body unchanged">
+      <img class="halfwidthflex" src="assets/keypoint_control.png"
+        alt="keypoint control">
     </div>
-    <p class="graybox">Normals found by optimization using a particular <em>λ</em> value can be conveniently
-      re-applied after optimization using a different <em>λ</em> to tune the stylization strength on demand.
-      Both larger and smaller <em>λ</em> result in salient and clean stylizations at the required strength.
-      The deformation region can also be controlled (either during or after optimization) by setting
-      rotation matrices of vertices outside the region to identity before the global solve.
-      We observe no boundary artifacts, showing dARAP's beneficial regularizing effects.
+    <p class="graybox"> <b>Keypoint Control Application.</b> Our localized weighting framework allows for user control over which features are represented in the
+      abstraction. After optimization, the user can further refine the curves by selecting additional keypoints,
+      and new curves can be quickly optimized to add detail to the feature of interest. Keypoints can be used to make
+      specific structures more explicit (e.g. wheels on the plane) or to add texture detail (e.g. nefertiti headband).
+      The refinement is rapid, and is completed in a few hundred iterations, or around a minute.
     </p>
   </section>
   <script>
