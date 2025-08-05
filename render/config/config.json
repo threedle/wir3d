@@ -1,0 +1,14 @@
+{
+    "light_type": "SUN",
+    "obj_location_offset_x": 0,
+    "obj_location_offset_y": 0,
+    "obj_location_offset_z": 0,
+    "SUBSURF": false,
+    "sph_radius": 0.008,
+    "sph_subdiv": 2,
+    "use_target": true,
+    "material": "Default OBJ",
+    "num_pc": -1,
+    "pc_hsv": [0.5, 1.0, 1.0, 1.0],
+    "pc_norm_fac": 0.005
+}
