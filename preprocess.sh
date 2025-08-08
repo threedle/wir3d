@@ -45,28 +45,13 @@ if [ -z "$KPFILE" ]; then
   echo "==========================="
   echo "Generating keypoints for model: $MODELPATH"
   echo "==========================="
-  python generate_keypoints_final.py $MODELPATH blender_030_360 --npoints 2 --model DINO --normalize --batchsize 4 --centertype latent --overlaydir surface_030_360 --modeltype RN50x16 --weighttype l2 --clustertype kmeans
+  python generate_keypoints_final.py $MODELPATH blender_030_360 --npoints 15 --model DINO --normalize --batchsize 4 --centertype latent --overlaydir surface_030_360 --modeltype RN50x16 --weighttype l2 --clustertype kmeans
   KPFILE="keypoints.pt"
 else
   echo "==========================="
   echo "Using provided keypoints file: $KPFILE"
   echo "==========================="
 fi
-
-echo "==========================="
-echo "Rendering surface keypoint-conditioned views for model: $MODELPATH"
-echo "==========================="
-python render_data.py $MODELPATH -15 15 3 -30 30 3 --rendername keypoint_nvdiff_-1515_-3030 --radius 0.3 --normalize --resolution 400 --anchors $KPFILE --overwrite
-
-# Render the keypoint-conditioned views
-echo "==========================="
-echo "Rendering blender keypoint-conditioned views for model: $MODELPATH"
-echo "==========================="
-rendercmd="$BLENDER36 ./render/blend_files/soft_shadow_light.blend --background --python ./render/render_mesh.py -- $MODELPATH config.json keypoint_-1515_-3030 --animate --resolution 400 400 --use_renderlist keypoint_nvdiff_-1515_-3030 --anchors $KPFILE --background-color-hex=#FFFFFFFF --normalize --overwrite"
-if [ -n "$TEXTUREFILE" ]; then
-  rendercmd="$rendercmd --textureimg $TEXTUREFILE"
-fi
-${rendercmd}
 
 # Fit SDF
 python sdf.py --objdir $MODELPATH --nsteps 20000 --res 256 --batch_size 1024 --positional --overwrite

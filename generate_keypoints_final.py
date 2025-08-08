@@ -31,7 +31,7 @@ parser.add_argument("--npoints", type=int, default=30, help='Number of keypoints
 parser.add_argument("--model", type=str, choices={"DINO", "SAM", "CLIP"}, default="DINO")
 parser.add_argument("--batchsize", type=int, default=8)
 parser.add_argument("--epochs", type=int, default=5)
-parser.add_argument("--clustertype", type=str, choices={"kmeans", "metis"}, default="metis")
+parser.add_argument("--clustertype", type=str, choices={"kmeans"}, default="kmeans")
 parser.add_argument("--weighttype", type=str, choices={"l2", "cosine"}, default="l2")
 parser.add_argument("--modelpath", type=str, default=None)
 parser.add_argument("--modeltype", type=str, default='ViT-L/14')
@@ -49,19 +49,18 @@ parser.add_argument("--scale", type=float, default=1.0)
 args = parser.parse_args()
 
 # Load mesh
-from meshing.io import PolygonSoup
-from meshing.mesh import Mesh
-import trimesh
+import igl
 import numpy as np
 
-mesh = trimesh.load(args.objdir, force="mesh")
+meshpath = args.objdir
+vertices, vt, n, faces, ftc, _ = igl.read_obj(meshpath)
 
 if args.normalize:
     # Normalize based on bounding box mean
     from igl import bounding_box
-    bb_vs, bf = bounding_box(mesh.vertices)
-    mesh.vertices -= np.mean(bb_vs, axis=0)
-    mesh.vertices /= (np.max(np.linalg.norm(mesh.vertices, axis=1)) / args.scale)
+    bb_vs, bf = bounding_box(vertices)
+    vertices -= np.mean(bb_vs, axis=0)
+    vertices /= (np.max(np.linalg.norm(vertices, axis=1)) / args.scale)
 
 import os
 from pathlib import Path
@@ -73,17 +72,14 @@ if savedir is None:
     savedir = os.path.dirname(args.objdir)
 Path(savedir).mkdir(exist_ok=True, parents=True)
 
-if args.overwrite:
-    clear_directory(savedir)
-
 # Setup cache
 cachedir = args.cachedir
 if cachedir is None:
     cachedir = os.path.join(savedir, f"kp_cache")
 Path(cachedir).mkdir(exist_ok=True, parents=True)
 
-modelcachedir = os.path.join(savedir, "kp_cache")
-Path(modelcachedir).mkdir(exist_ok=True, parents=True)
+if args.overwrite:
+    clear_directory(cachedir)
 
 # If keypoints exist, then we're done
 savename = args.savename
@@ -92,12 +88,14 @@ if savename is None:
 
 keypointsdir = os.path.join(savedir, savename)
 if os.path.exists(keypointsdir):
-    print(f"Already done with {keypointsdir}")
-    exit(0)
+    if args.overwrite:
+        os.remove(keypointsdir)
+    else:
+        print(f"Already done with {keypointsdir}")
+        exit(0)
 
 from backto3d.feature_backprojection import DINOWrapper, SAMWrapper, CLIPWrapper
 from backto3d.feature_backprojection.backprojection import features_from_renders
-from backto3d.utils.geometry import pairwise_geodesic_distances_mesh
 import torch
 
 # Compute features
@@ -111,8 +109,8 @@ if args.model == "CLIP":
     model = CLIPWrapper(device, modelpath=args.modelpath, modeltype=args.modeltype)
     dim = 224
 
-vertices = torch.from_numpy(mesh.vertices).float().to(device)
-faces = torch.from_numpy(mesh.faces).long().to(device)
+vertices = torch.from_numpy(vertices).float().to(device)
+faces = torch.from_numpy(faces).long().to(device)
 
 ### Load json transforms & renders ###
 import json
@@ -143,7 +141,7 @@ lookats = torch.tensor(lookats).to(device)
 dataset = RenderDataset(renders, positions, lookats)
 dataloader = DataLoader(dataset, batch_size=args.batchsize, shuffle=True)
 
-feature_path = os.path.join(modelcachedir, "features.pt")
+feature_path = os.path.join(cachedir, "features.pt")
 if os.path.exists(feature_path):
     features = torch.load(feature_path, weights_only=True, map_location=device)
 else:
@@ -215,7 +213,7 @@ if args.clustertype == 'kmeans':
 
     n_clusters = args.npoints
     # Cache the labels and latent keypoints
-    kmeans_path = os.path.join(modelcachedir, "kmeans.npz")
+    kmeans_path = os.path.join(cachedir, "kmeans.npz")
     if os.path.exists(kmeans_path):
         kmeans_results = np.load(kmeans_path)
         labels = kmeans_results['labels']
@@ -227,47 +225,6 @@ if args.clustertype == 'kmeans':
         keypoints = torch.tensor(kmeans.cluster_centers_).to(device)
         labels = kmeans.labels_
         np.savez(kmeans_path, labels = labels, keypoints = keypoints.detach().cpu().numpy())
-elif args.clustertype == "metis":
-    metis_path = os.path.join(modelcachedir, "metis.npy")
-
-    if os.path.exists(metis_path):
-        labels = np.load(metis_path)
-    else:
-        from meshing.io import PolygonSoup
-        from meshing.mesh import Mesh
-
-        soup = PolygonSoup.from_obj(args.objdir)
-        he_mesh = Mesh(soup.vertices, soup.indices)
-        vs, fs, es = he_mesh.export_soup()
-
-        # Turn weights into a dictionary so we can index for the vertex pairs easier
-        if args.weighttype == "l2":
-            weights = 1 - torch.mean(torch.square(features[es[:,0]] - features[es[:,1]]), dim=1).cpu().numpy()
-        elif args.weighttype == "cosine":
-            weights = torch.nn.functional.cosine_similarity(features[es[:,0]], features[es[:,1]], dim=1).cpu().numpy()
-
-        weights_dict = {}
-        for i, e in enumerate(es):
-            weights_dict[(e[0], e[1])] = weights[i]
-            weights_dict[(e[1], e[0])] = weights[i]
-
-        # Generate the xadj and adjncy arrays based on the C requirements
-        xadj = np.zeros(len(vs) + 1, dtype=int) # len(vertices) + 1
-        adjncy = [] # len(edges) * 2
-        eweights = [] # len(edges) * 2
-
-        for vi, vertex in he_mesh.topology.vertices.items():
-            for adjv in vertex.adjacentVertices():
-                adjncy.append(adjv.index)
-                eweights.append(weights_dict[(vi, adjv.index)])
-            endi = len(adjncy)
-            xadj[vi + 1] = endi
-
-        import pymetis
-        n_cuts, membership = pymetis.part_graph(args.npoints, xadj=xadj, adjncy=adjncy, eweights=np.array(eweights)*10, recursive=False, contiguous=True)
-        labels = np.array(membership)
-
-        np.save(metis_path, labels)
 
 # Get closest face to each cluster center
 print(f"Done with {args.clustertype} clustering")

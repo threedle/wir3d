@@ -2,7 +2,6 @@ from torch import nn
 import torch
 import matplotlib.pyplot as plt
 import mesh_to_sdf
-from mesh_to_sdf import mesh_to_voxels
 import os
 import numpy as np
 

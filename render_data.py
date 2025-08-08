@@ -157,11 +157,9 @@ def render(renderdir, meshdir, positions, lookats, fov, fp_out=None, texturedir=
     from new_renderer import Renderer
     from pathlib import Path
     import json
-    from meshing.io import PolygonSoup
-    from meshing.mesh import Mesh
     import shutil
     from tqdm import trange
-    import trimesh
+    import igl
 
     # if os.path.exists(renderdir):
     #     shutil.rmtree(renderdir)
@@ -186,40 +184,34 @@ def render(renderdir, meshdir, positions, lookats, fov, fp_out=None, texturedir=
         assert os.path.exists(texturedir), f"{texturedir} not found"
 
     renderer = Renderer(device, dim=resolution, interpolation_mode = 'bilinear', fov=fov)
-
-    # soup = PolygonSoup.from_obj(meshdir)
-    # mesh = Mesh(soup.vertices, soup.indices)
-    # mesh.normalize()
-
-    mesh = trimesh.load(meshdir, force="mesh", process=False)
+    vertices, vt, n, faces, ftc, _ = igl.read_obj(meshdir)
 
     if normalize:
         # Normalize based on bounding box mean
         from igl import bounding_box
-        bb_vs, bf = bounding_box(mesh.vertices)
-        mesh.vertices -= np.mean(bb_vs, axis=0)
-        mesh.vertices /= (np.max(np.linalg.norm(mesh.vertices, axis=1)) / scale)
+        bb_vs, bf = bounding_box(vertices)
+        vertices -= np.mean(bb_vs, axis=0)
+        vertices /= (np.max(np.linalg.norm(vertices, axis=1)) / scale)
 
-    vertices = torch.from_numpy(mesh.vertices).float().to(device)
-    faces = torch.from_numpy(mesh.faces).long().to(device)
+    vertices = torch.from_numpy(vertices).float().to(device)
+    faces = torch.from_numpy(faces).long().to(device)
     up = up.to(device)
 
     if texturedir is not None:
         tex = torchvision.io.read_image(texturedir).float().to(device) / 255.
 
-        soup = PolygonSoup.from_obj(meshdir)
-        uvs = torch.from_numpy(soup.uvs).float().to(device)
-        uvfs = torch.from_numpy(soup.face_uv.astype(int)).long().to(device)
+        uvs = torch.from_numpy(vt).float().to(device)
+        uvfs = torch.from_numpy(ftc).long().to(device)
 
         soupvs = vertices[faces].reshape(-1, 3)
-        soupuvs = uvs[soup.face_uv.astype(int)].reshape(-1, 2)
+        soupuvs = uvs[uvfs].reshape(-1, 2)
         assert len(soupvs) == len(soupuvs)
         soupfs = torch.from_numpy(np.arange(len(soupvs)).reshape(-1, 3)).to(device)
         vertices, faces, uvs, uvfs = soupvs, soupfs, soupuvs, soupfs
 
         soupuv = uvs[uvfs].reshape(-1, 3, 2)
     else:
-        colors = torch.ones((len(mesh.vertices), 3)).to(device) * 0.7
+        colors = torch.ones((len(vertices), 3)).to(device) * 0.7
 
     # Load keypoints if they exist
     keypoints = None
