@@ -191,7 +191,7 @@ video {
   margin: 10px auto;
 }
 
-.teaser {
+/* .teaser {
   --promptfontsz: 1.1rem;
 
   .promptprefix {
@@ -233,6 +233,82 @@ video {
       color: var(--accent);
       text-align: center;
     }
+  }
+} */
+
+.teaser-container {
+  width: 100%;
+  max-width: var(--medwidthflex-w);
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.teaser-videos {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: end;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 0; /* ✅ no whitespace */
+  position: relative;
+}
+
+.teaser-videos video {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  position: relative; /* ✅ needed for transform-based overlap */
+  transition: transform 0.2s ease;
+}
+
+/* Odd videos: small (1 col), raised slightly */
+.teaser-videos video:nth-child(1),
+.teaser-videos video:nth-child(3),
+.teaser-videos video:nth-child(5),
+.teaser-videos video:nth-child(7) {
+  grid-column: span 1;
+  transform: translateY(-10px); /* ✅ raise odd videos */
+  z-index: 2;
+}
+
+/* Even videos: large (2 cols), overlap left by 20px */
+.teaser-videos video:nth-child(2),
+.teaser-videos video:nth-child(4),
+.teaser-videos video:nth-child(6),
+.teaser-videos video:nth-child(8) {
+  grid-column: span 2;
+  margin-left: -15px; /* ✅ overlap previous video */
+  z-index: 1; /* ✅ ensures even videos sit above odd ones */
+}
+
+/* ✅ Tablet version (same visual logic) */
+@media (max-width: 900px) {
+  .teaser-videos {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .teaser-videos video:nth-child(odd) {
+    grid-column: span 1;
+    transform: translateY(-10px);
+  }
+
+  .teaser-videos video:nth-child(even) {
+    grid-column: span 2;
+    margin-left: -20px;
+  }
+}
+
+/* ✅ Mobile: stack full-width, no overlap */
+@media (max-width: 500px) {
+  .teaser-videos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .teaser-videos video {
+    grid-column: span 1 !important;
+    margin-left: 0 !important;
+    transform: none !important;
+    z-index: auto !important;
   }
 }
 
